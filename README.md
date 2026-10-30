@@ -1,200 +1,414 @@
-# GlucoCare AI – An ML-Based Diabetes Risk Screening and Prediction System
+# 🩺 GlucoCare AI
+### An ML-Based Diabetes Risk Screening and Prediction System
 
-> **Educational screening prototype – NOT a medical diagnostic system.** Predictions are statistical estimates
-> and must not replace professional medical advice.
+<p align="center">
+  <strong>Artificial Intelligence and Machine Learning in Healthcare</strong>
+</p>
 
-**Subject:** Artificial Intelligence and Machine Learning in Healthcare (BE Computer Engineering)
+<p align="center">
+  A Machine Learning-powered educational healthcare application that analyzes patient health parameters and estimates diabetes risk using classification algorithms.
+</p>
 
 ---
 
-## 1. Abstract
-GlucoCare AI is an end-to-end Machine Learning project that estimates the likelihood of diabetes from eight routine
-health measurements. It trains and compares Logistic Regression and Random Forest classifiers on the Pima Indians
-Diabetes Dataset, selects the final model using cross-validation (with emphasis on recall), and serves it through a
-Streamlit dashboard. The project demonstrates data cleaning, leakage-free preprocessing, model evaluation, and
-responsible communication of ML results in healthcare.
+## 📌 Project Overview
 
-## 2. Introduction
-Diabetes mellitus is a chronic condition in which the body cannot properly regulate blood glucose. Many people
-remain undiagnosed for years. Machine Learning can learn patterns from historical patient records and give an early,
-low-cost *screening-style* estimate, prompting people to seek proper medical testing.
+**GlucoCare AI** is an end-to-end Machine Learning project designed to demonstrate how Artificial Intelligence can be applied in healthcare for diabetes risk screening.
 
-## 3. Problem Statement
-Manual screening requires clinical visits and laboratory tests. There is a need for a simple, data-driven tool that
-estimates diabetes likelihood from basic measurements, while being transparent about its limitations.
+The application analyzes eight health-related parameters using trained Machine Learning models to generate an estimated diabetes risk prediction.
 
-## 4. Objectives
-1. Build a complete ML pipeline (load → clean → split → train → evaluate → save).
-2. Compare at least two classification algorithms fairly on the same held-out data.
-3. Choose the final model using healthcare-relevant criteria (recall, not accuracy alone).
-4. Provide an interactive dashboard for prediction, performance review and data exploration.
-5. Communicate results with neutral language and clear disclaimers.
+It uses the Pima Indians Diabetes Dataset and implements Logistic Regression and Random Forest classifiers. The models are evaluated and compared using multiple performance metrics, with Random Forest selected based on its cross-validated F2-score.
 
-## 5. Existing System
-Traditional screening relies on questionnaires (e.g. risk scores) and laboratory tests (fasting glucose, OGTT, HbA1c)
-interpreted by clinicians. These are accurate but need appointments, equipment and trained staff.
+An interactive Streamlit dashboard allows users to enter health parameters, view predictions, explore the dataset, and understand model performance.
 
-## 6. Proposed System
-A lightweight ML-based screening prototype: the user enters eight measurements, the saved scikit-learn pipeline
-cleans the input exactly as in training, and the model returns a predicted class with an estimated probability.
+> ⚠️ **Disclaimer:** GlucoCare AI is an educational screening prototype and is NOT a medical diagnostic system. Its predictions are statistical estimates and must not replace professional medical advice, laboratory testing, or clinical diagnosis.
 
-## 7. Hardware and Software Requirements
-| Item | Requirement |
+## ✨ Key Features
+
+- **Diabetes Risk Prediction:** Estimates diabetes risk using eight patient health parameters.
+- **Machine Learning Models:** Implements Logistic Regression and Random Forest.
+- **Data Preprocessing:** Handles invalid zero values and missing measurements using appropriate preprocessing techniques.
+- **Model Comparison:** Evaluates multiple classifiers and selects a model using cross-validation.
+- **Performance Evaluation:** Displays accuracy, precision, recall, F1-score, ROC-AUC, and confusion matrices.
+- **Interactive Dashboard:** Provides a user-friendly Streamlit interface.
+- **Dataset Exploration:** Visualizes feature distributions, correlations, and class distributions.
+- **Healthcare Awareness:** Provides general information about diabetes prevention and healthy lifestyle practices.
+
+## 🛠️ Technology Stack
+
+| Category | Technologies |
 |---|---|
-| Hardware | Any laptop/PC, 4 GB RAM (8 GB recommended), ~1 GB free disk |
-| OS | Windows 10/11, macOS, or Linux |
-| Python | 3.9 or newer (3.10+ recommended) |
-| Libraries | pandas, numpy, scikit-learn, matplotlib, seaborn, streamlit, joblib, Pillow |
-| Browser | Any modern browser (Chrome, Edge, Firefox) |
+| Programming Language | Python |
+| Data Processing | Pandas, NumPy |
+| Machine Learning | Scikit-learn |
+| Data Visualization | Matplotlib, Seaborn |
+| Frontend | Streamlit |
+| Model Persistence | Joblib |
+| Dataset | Pima Indians Diabetes Dataset |
 
-## 8. Dataset Description
-**Pima Indians Diabetes Database** – originally from the National Institute of Diabetes and Digestive and Kidney
-Diseases (NIDDK), distributed by the UCI Machine Learning Repository and mirrored on Kaggle.
-It is commonly documented as 768 records of female patients of Pima Indian heritage, aged 21 or older; the training
-script prints the exact counts it finds.
+## 📊 Dataset Description
 
-| Feature | Meaning |
+The project uses the **Pima Indians Diabetes Dataset**, which contains 768 patient records and eight input features.
+
+The dataset is commonly used for educational research and binary classification experiments involving diabetes prediction.
+
+### Input Features
+
+| Feature | Description |
 |---|---|
 | Pregnancies | Number of times pregnant |
-| Glucose | Plasma glucose concentration (2 h oral glucose tolerance test) |
-| BloodPressure | Diastolic blood pressure (mm Hg) |
-| SkinThickness | Triceps skin-fold thickness (mm) |
-| Insulin | 2-hour serum insulin (mu U/ml) |
-| BMI | Body mass index (kg/m²) |
-| DiabetesPedigreeFunction | Score summarising family history of diabetes |
+| Glucose | Plasma glucose concentration |
+| Blood Pressure | Diastolic blood pressure |
+| Skin Thickness | Triceps skin-fold thickness |
+| Insulin | 2-hour serum insulin |
+| BMI | Body Mass Index |
+| Diabetes Pedigree Function | Family-history-related diabetes score |
 | Age | Age in years |
-| **Outcome** (target) | 0 = non-diabetic, 1 = diabetic |
 
-**Source links:**
-- Kaggle mirror: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
-- Original paper: Smith, J.W., Everhart, J.E., Dickson, W.C., Knowler, W.C., Johannes, R.S. (1988).
-  *Using the ADAP learning algorithm to forecast the onset of diabetes mellitus.* Proc. Annual Symposium on
-  Computer Application in Medical Care, 261–265.
+**Target Variable:**
+- `0` – Non-diabetic
+- `1` – Diabetic
 
-`python -m src.train_model` tries to download the CSV automatically from public mirrors. If you are offline or the
-download fails, download `diabetes.csv` manually from the Kaggle link and place it at `data/diabetes.csv`.
-**No data in this project is generated or fabricated.**
+### Dataset Distribution
 
-## 9. Methodology
-1. **Load & inspect** the dataset; check NaNs and duplicates.
-2. **Invalid zeros:** zeros in Glucose, BloodPressure, SkinThickness, Insulin and BMI are impossible → treated as
-   missing and filled with the **median** (robust to outliers).
-3. **EDA:** distributions, class balance, correlation heatmap (notebook + dashboard).
-4. **Stratified 80/20 split** with `random_state=42`.
-5. **Pipeline** = zeros→NaN → median imputer → (StandardScaler for Logistic Regression) → classifier.
-   Everything is fitted on training data only → **no data leakage**.
-6. **Tuning:** `GridSearchCV`, 5-fold stratified CV, on the training set only.
-7. **Model selection:** highest cross-validated **F2-score** (recall weighted twice as much as precision), chosen
-   **without looking at the test set**.
-8. **Final evaluation:** accuracy, precision, recall, F1, ROC-AUC, confusion matrix, classification report on the
-   untouched test set.
-9. **Persistence:** pipeline + metadata saved with Joblib; the app loads the same file.
+| Category | Records |
+|---|---:|
+| Total Records | 768 |
+| Non-diabetic (0) | 500 |
+| Diabetic (1) | 268 |
+| Input Features | 8 |
 
-## 10. Algorithms Used
-- **Logistic Regression** – linear model that outputs a probability with the sigmoid function; interpretable baseline.
-- **Random Forest** – ensemble of many decision trees trained on random subsets; captures non-linear relationships and
-  gives feature importance.
-Both use `class_weight="balanced"` because diabetic cases are the minority class, so missed cases are penalised more.
+**Dataset Source:** [Pima Indians Diabetes Database – Kaggle](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database)
 
-## 11. System Architecture
+The training script attempts to download the dataset automatically. If downloading fails, the CSV can be placed manually inside the `data/` directory.
+
+## ⚙️ Methodology
+
+The project follows an end-to-end Machine Learning workflow.
+
+### 1. Data Collection
+The Pima Indians Diabetes Dataset is loaded using Pandas.
+
+### 2. Data Preprocessing
+- Dataset inspection and quality checks.
+- Identification of missing and invalid values.
+- Treatment of zero values in selected medical measurements.
+- Median imputation.
+- Feature scaling where required.
+- Stratified training and testing split.
+
+### 3. Model Training
+
+Two classification algorithms are implemented:
+
+**Logistic Regression**
+
+A supervised classification algorithm that estimates the probability of a binary outcome using a logistic function. It serves as an interpretable baseline model.
+
+**Random Forest Classifier**
+
+An ensemble learning algorithm that combines multiple decision trees to generate predictions. It can capture more complex relationships between input features.
+
+### 4. Model Selection
+
+GridSearchCV with stratified cross-validation is used for hyperparameter tuning.
+
+The final model is selected based on the highest cross-validated F2-score. F2 gives greater importance to recall, which is particularly relevant when evaluating screening models.
+
+### 5. Model Evaluation
+
+The models are evaluated using:
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- Confusion Matrix
+
+### 6. Prediction
+
+The selected trained model is saved using Joblib and loaded by the Streamlit application to generate predictions from user inputs.
+
+## 🏗️ System Architecture
+
+```text
+       Pima Indians Diabetes Dataset
+                    |
+                    v
+             Data Collection
+                    |
+                    v
+             Data Preprocessing
+                    |
+                    v
+              Train-Test Split
+                    |
+                    v
+              Model Training
+                    |
+           +--------+--------+
+           |                 |
+           v                 v
+     Logistic Regression  Random Forest
+           |                 |
+           +--------+--------+
+                    |
+                    v
+             Model Evaluation
+                    |
+                    v
+              Model Selection
+                    |
+                    v
+           Save Trained Model
+                    |
+                    v
+             Streamlit App
+                    |
+                    v
+             Patient Inputs
+                    |
+                    v
+             Risk Prediction
+                    |
+                    v
+          Prediction Dashboard
 ```
- diabetes.csv ─► preprocessing.py ─► train_model.py ─► models/diabetes_model.pkl
-                  (load, clean,        (CV tuning,     models/metrics.json
-                   Pipeline)            evaluation)     assets/figures/*.png
-                                                              │
- User ► Streamlit form (app.py) ► prediction.py ► saved Pipeline ► class + probability ► dashboard
-```
 
-## 12. Results and Evaluation
-Results are **produced by your own training run** – none are hard-coded or copied from elsewhere.
-After running `python -m src.train_model`:
-- the full console output shows data checks, CV scores and test metrics;
-- `models/results_summary.md` contains a ready-made results table and the model-selection explanation;
-- `models/metrics.json` feeds the **Model Performance** page;
-- `assets/figures/` contains the confusion matrices, model comparison, ROC curves and feature importance PNGs.
+## 📈 Model Performance and Results
 
-**Paste the table from `models/results_summary.md` here before submission:**
+Both models were trained and evaluated using the same stratified training and testing split.
 
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC | False negatives |
-|---|---|---|---|---|---|---|
-| _(paste after training)_ | | | | | | |
+The dataset was divided into:
+- Training set: 614 records
+- Testing set: 154 records
 
-**Metrics in healthcare context**
-- *Accuracy* – overall correctness; can hide missed diabetic cases when classes are imbalanced.
-- *Precision* – of people flagged, how many truly had diabetes (low → false alarms).
-- *Recall* – of people who truly had diabetes, how many were caught (low → missed cases = **false negatives**,
-  the costliest error in screening).
-- *F1* – balance of precision and recall. *F2* (used for selection) favours recall.
-- *ROC-AUC* – threshold-independent ability to separate the classes.
+### Model Comparison
 
-## 13. Screenshots
-Add screenshots after running the app (e.g. into `assets/screenshots/`):
-1. Home dashboard 2. Risk Prediction result 3. Model Performance 4. Dataset Explorer
+The following results were obtained from the actual training and evaluation run:
 
-## 14. Installation Instructions
-```bash
-# 1. Open a terminal in the project folder (GlucoCare-AI/)
-python -m venv venv
+| Evaluation Metric | Logistic Regression | Random Forest |
+|---|---:|---:|
+| Accuracy | 70.8% | 72.7% |
+| Precision | 57.1% | 59.1% |
+| Recall | 66.7% | 72.2% |
+| F1-score | 61.5% | 65.0% |
+| ROC-AUC | 0.810 | 0.818 |
+| False Negatives | 18 | 15 |
+| Cross-validated F2-score | 0.704 | 0.739 |
 
-# 2. Activate the virtual environment
-#    Windows (PowerShell):   venv\Scripts\Activate.ps1
-#    Windows (cmd):          venv\Scripts\activate.bat
-#    macOS / Linux:          source venv/bin/activate
+### Selected Model: Random Forest
 
-# 3. Install dependencies
-pip install -r requirements.txt
-```
+Random Forest was selected because it achieved the highest mean cross-validated F2-score of **0.739**, compared with 0.704 for Logistic Regression.
 
-## 15. Execution Instructions
-```bash
-# Step 1 – get the dataset (automatic attempt happens inside the training script)
-#          If it fails, place diabetes.csv in the data/ folder manually.
+It also achieved higher recall on the held-out test dataset, identifying more of the actual positive cases in this particular evaluation.
 
-# Step 2 – train, evaluate and save the model  (run from the project root)
-python -m src.train_model
+### Understanding the Evaluation Metrics
 
-# Step 3 – launch the dashboard
-streamlit run app.py
-```
-Optional EDA notebook: `pip install notebook` then `cd notebooks && jupyter notebook`.
+- **Accuracy:** Measures the proportion of correctly classified records.
+- **Precision:** Measures how many predicted positive cases were actually positive.
+- **Recall:** Measures how many actual positive cases were correctly identified.
+- **F1-score:** Represents the harmonic mean of precision and recall.
+- **ROC-AUC:** Measures the model's ability to distinguish between the two classes.
+- **Confusion Matrix:** Shows correct and incorrect classification counts.
 
-> Always run the training command from the project root using `python -m src.train_model`
-> so that the saved model can be loaded by the app.
+In healthcare screening, recall is especially important because false negatives represent positive cases that the model fails to identify.
 
-## 16. Limitations
-- Small dataset (a few hundred records) → results have noticeable uncertainty.
-- Only female patients of Pima Indian heritage, age 21+ → may **not generalise** to other groups.
-- Several measurements (Insulin, SkinThickness) had many missing values replaced by medians.
-- Probabilities from the models may not be well calibrated.
-- No external validation; no clinical testing; outcome definition comes from the original study.
-- The 0.5 decision boundary is an algorithmic default, **not** a medically validated threshold.
+*Note: These results are specific to this dataset split and evaluation procedure. They do not establish clinical accuracy or suitability for real-world diagnosis.*
 
-## 17. Future Scope
-Larger, more diverse and recent datasets; more models (gradient boosting, SVM, neural networks); probability
-calibration; explainability with SHAP/LIME; fairness analysis across subgroups; external clinical validation;
-secure cloud deployment; multilingual interface.
+## 🖥️ Application Modules
 
-## 18. Project Structure
-```
+The Streamlit application includes the following sections:
+
+1. **Home Dashboard:** Introduction, project overview, and system workflow.
+2. **Diabetes Risk Prediction:** Patient input form and ML-generated prediction.
+3. **Model Performance:** Evaluation metrics and model comparison.
+4. **Dataset Explorer:** Dataset preview and visual analytics.
+5. **Healthcare Awareness:** General diabetes awareness and preventive information.
+6. **About Project:** Project details, methodology, limitations, and future scope.
+
+## 📂 Project Structure
+
+```text
 GlucoCare-AI/
-├── app.py                  # Streamlit dashboard (6 pages)
+│
+├── app.py
 ├── requirements.txt
 ├── README.md
 ├── VIVA_QUESTIONS.md
-├── data/diabetes.csv       # you place / download this
-├── models/                 # diabetes_model.pkl, metrics.json, results_summary.md (created by training)
-├── notebooks/exploratory_data_analysis.ipynb
+│
+├── data/
+│   └── diabetes.csv
+│
+├── models/
+│   ├── diabetes_model.pkl
+│   ├── metrics.json
+│   └── results_summary.md
+│
+├── notebooks/
+│   └── exploratory_data_analysis.ipynb
+│
 ├── src/
-│   ├── preprocessing.py    # loading, quality checks, pipeline builder, split
-│   ├── train_model.py      # tuning, comparison, selection, saving
-│   ├── evaluation.py       # metrics + all plots
-│   └── prediction.py       # model loading, input validation, prediction
-└── assets/logo.png, figures/
+│   ├── __init__.py
+│   ├── preprocessing.py
+│   ├── train_model.py
+│   ├── evaluation.py
+│   └── prediction.py
+│
+└── assets/
+    ├── logo.png
+    └── figures/
 ```
 
-## 19. References
-1. Smith et al. (1988). *Using the ADAP learning algorithm to forecast the onset of diabetes mellitus.*
-2. UCI / Kaggle – Pima Indians Diabetes Database: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
-3. Pedregosa et al. (2011). *Scikit-learn: Machine Learning in Python.* JMLR 12, 2825–2830.
-4. WHO – Diabetes fact sheet: https://www.who.int/news-room/fact-sheets/detail/diabetes
-5. Streamlit documentation: https://docs.streamlit.io
+*The model and evaluation files are generated after running the training script.*
+
+## 🚀 Installation and Setup
+
+### Prerequisites
+
+- Python 3.9 or newer
+- Git
+- VS Code or another Python IDE
+- Internet connection for the initial dataset download
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/GlucoCare-AI.git
+```
+
+### Step 2: Navigate to the Project Directory
+
+```bash
+cd GlucoCare-AI
+```
+
+### Step 3: Create a Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+### Step 4: Activate the Virtual Environment
+
+**Windows PowerShell:**
+
+```powershell
+venv\Scripts\Activate.ps1
+```
+
+**macOS / Linux:**
+
+```bash
+source venv/bin/activate
+```
+
+### Step 5: Install Dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+## ▶️ Running the Project
+
+### Step 1: Train the Machine Learning Model
+
+Run this command from the project root directory:
+
+```bash
+python -m src.train_model
+```
+
+This will:
+- Load the dataset.
+- Perform data preprocessing.
+- Train and tune the classification models.
+- Evaluate model performance.
+- Select the final model.
+- Save the trained model and evaluation results.
+
+### Step 2: Launch the Streamlit Application
+
+```bash
+python -m streamlit run app.py
+```
+
+### Step 3: Open the Application
+
+Open the local URL displayed in your terminal, usually:
+
+```text
+http://localhost:8501
+```
+
+## 📸 Application Screenshots
+
+Add actual screenshots of the running application in this section.
+
+| Module | Screenshot |
+|---|---|
+| Home Dashboard | Add home dashboard screenshot |
+| Risk Prediction | Add prediction screenshot |
+| Model Performance | Add evaluation dashboard screenshot |
+| Dataset Explorer | Add dataset visualization screenshot |
+
+You can save screenshots inside `assets/screenshots/` and embed them using Markdown image links.
+
+## ⚠️ Limitations
+
+- The dataset contains only 768 records.
+- The dataset represents female patients of Pima Indian heritage aged 21 years and older.
+- The model may not generalize to other demographic populations.
+- Several medical measurements contain invalid zero values that require imputation.
+- Model probabilities may not be clinically calibrated.
+- The model has not undergone external clinical validation.
+- The system cannot replace professional medical consultation or laboratory testing.
+
+## 🔮 Future Scope
+
+Possible improvements include:
+
+- Training with larger and more diverse healthcare datasets.
+- Exploring additional algorithms such as SVM and Gradient Boosting.
+- Integrating Explainable AI techniques such as SHAP and LIME.
+- Performing fairness and subgroup performance analysis.
+- Improving probability calibration.
+- Developing secure healthcare data integration.
+- Exploring multilingual support.
+- Conducting external validation with qualified healthcare professionals.
+
+## 🎯 Project Objective and Educational Significance
+
+GlucoCare AI demonstrates the practical application of supervised Machine Learning in healthcare.
+
+It provides hands-on experience with dataset preprocessing, classification algorithms, model evaluation, model persistence, and interactive application development.
+
+The project highlights both the potential and limitations of using AI for healthcare screening.
+
+## 📚 References
+
+1. Smith, J. W., Everhart, J. E., Dickson, W. C., Knowler, W. C., & Johannes, R. S. (1988). *Using the ADAP learning algorithm to forecast the onset of diabetes mellitus.* Proceedings of the Annual Symposium on Computer Application in Medical Care, 261–265.
+2. [Pima Indians Diabetes Database – Kaggle](https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database)
+3. Pedregosa, F. et al. (2011). *Scikit-learn: Machine Learning in Python.* Journal of Machine Learning Research, 12, 2825–2830.
+4. [Scikit-learn Documentation](https://scikit-learn.org/stable/)
+5. [Streamlit Documentation](https://docs.streamlit.io/)
+6. [Pandas Documentation](https://pandas.pydata.org/docs/)
+7. [NumPy Documentation](https://numpy.org/doc/)
+
+---
+
+## 👩‍💻 Author
+
+**Maithili Pandey**
+
+BE Computer Engineering  
+Specialization: Artificial Intelligence and Machine Learning
+
+**Academic Year:** 2026–2027
+
+---
+
+⭐ If you find this project interesting, consider giving the repository a star!
+
+**GlucoCare AI – Exploring the potential of Machine Learning in Healthcare.**
