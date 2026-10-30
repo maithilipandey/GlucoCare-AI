@@ -1,4 +1,4 @@
-# 🩺 GlucoCare AI   -  ### An ML-Based Diabetes Risk Screening and Prediction System
+# 🩺 GlucoCare AI   -  An ML-Based Diabetes Risk Screening and Prediction System
 
 <p align="center">
   <strong>Artificial Intelligence and Machine Learning in Healthcare</strong>
